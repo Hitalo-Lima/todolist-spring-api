@@ -16,6 +16,13 @@ public class UserController {
     // Informações do POST vão vir por meio do body da requisição
     @PostMapping("/")
     public UserModel create(@RequestBody UserModel userModel) {
+        var user = this.userRepository.findByUsername(userModel.getUsername());
+
+        if(user != null) {
+            System.out.println("Usuário já existe na base de dados!");
+            return null;
+        }
+
         var userCreated = this.userRepository.save(userModel);
         return userCreated;
     }
