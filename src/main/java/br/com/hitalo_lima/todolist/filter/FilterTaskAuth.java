@@ -1,23 +1,46 @@
 package br.com.hitalo_lima.todolist.filter;
 
 import java.io.IOException;
+import java.util.Base64;
 
 import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
 
-import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.ServletRequest;
-import jakarta.servlet.ServletResponse;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 @Component
-public class FilterTaskAuth implements Filter {
+public class FilterTaskAuth extends OncePerRequestFilter {
 
-    @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
-            throws IOException, ServletException {
-        System.out.println("Chegou no filtro");
-        chain.doFilter(request, response);
-    }
+	@Override
+	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+			throws ServletException, IOException {
+
+		// pegar a autenticação (user e senha)
+				var autorization = request.getHeader("Authorization");
+				var authEncoded = autorization.substring("Basic".length()).trim();
+
+				byte[] authDecoded = Base64.getDecoder().decode(authEncoded);
+
+				var authString = new String(authDecoded);
+
+				String[] credentials = authString.split(":");
+
+				String username = credentials[0];
+				String password = credentials[1];
+
+				System.out.println(username);
+				System.out.println(password);
+
+		// TODO: validar usuário
+
+		// TODO: validar senha
+
+		// TODO: seguir em frente com o usuário autenticado
+
+		filterChain.doFilter(request, response);
+	}
 
 }
